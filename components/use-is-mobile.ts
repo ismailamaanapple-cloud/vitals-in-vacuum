@@ -22,3 +22,32 @@ export function useIsMobile(query = "(max-width: 768px)") {
 
   return isMobile;
 }
+
+/**
+ * True when we should minimize continuous animation: on mobile/touch devices
+ * (limited GPU/CPU) or when the user prefers reduced motion. Used to make
+ * decorative infinite framer-motion loops static so the main thread stays free.
+ */
+export function useReducedEffects() {
+  const [reduced, setReduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      (window.matchMedia("(max-width: 820px)").matches ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches),
+  );
+
+  useEffect(() => {
+    const small = window.matchMedia("(max-width: 820px)");
+    const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(small.matches || rm.matches);
+    onChange();
+    small.addEventListener("change", onChange);
+    rm.addEventListener("change", onChange);
+    return () => {
+      small.removeEventListener("change", onChange);
+      rm.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  return reduced;
+}

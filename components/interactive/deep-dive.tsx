@@ -13,7 +13,7 @@ export default function DeepDiveSection({
   return (
     <div className="relative overflow-hidden rounded-[2rem] glass p-7 sm:p-12">
       <div
-        className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full opacity-[0.12] blur-[100px]"
+        className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full opacity-[0.12] blur-3xl"
         style={{ background: accent }}
       />
       <div className="relative">

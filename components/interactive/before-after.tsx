@@ -4,6 +4,7 @@ import { useRef, useState, useCallback } from "react";
 import type { SliderData, Module } from "@/lib/modules";
 import CompareVisual from "./compare-visual";
 import { useInView } from "../use-in-view";
+import { useReducedEffects } from "../use-is-mobile";
 
 const EARTH_ACCENT = "#5dffc2";
 
@@ -20,6 +21,7 @@ export default function BeforeAfter({
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
   const [rootRef, inView] = useInView<HTMLDivElement>("200px");
+  const lite = useReducedEffects();
 
   const move = useCallback((clientX: number) => {
     if (!ref.current) return;
@@ -50,6 +52,7 @@ export default function BeforeAfter({
             variant={variant}
             side="space"
             play={inView}
+            lite={lite}
           />
         </div>
 
@@ -66,6 +69,7 @@ export default function BeforeAfter({
             variant={variant}
             side="earth"
             play={inView}
+            lite={lite}
           />
         </div>
 
@@ -118,6 +122,7 @@ function Panel({
   variant,
   side,
   play,
+  lite,
 }: {
   label: string;
   headline: string;
@@ -126,6 +131,7 @@ function Panel({
   variant: Module["visual"];
   side: "earth" | "space";
   play: boolean;
+  lite: boolean;
 }) {
   return (
     <div className="relative flex h-full flex-col p-5 sm:p-7">
@@ -142,7 +148,7 @@ function Panel({
       {/* Animated figure — only mounted (and animating) while in view */}
       <div className="pointer-events-none flex flex-1 items-center justify-center py-2">
         <div className="h-full max-h-[230px] w-full max-w-[230px]">
-          {play && <CompareVisual variant={variant} side={side} color={accent} />}
+          {play && <CompareVisual variant={variant} side={side} color={accent} lite={lite} />}
         </div>
       </div>
 

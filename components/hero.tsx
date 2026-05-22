@@ -9,31 +9,29 @@ import { useIsMobile } from "./use-is-mobile";
 const HeroScene = dynamic(() => import("./three/hero-scene"), { ssr: false });
 
 /* Cheap, GPU-friendly CSS space backdrop — used on mobile (no WebGL) and as
-   the instant first-paint background on desktop before the 3D scene mounts. */
+   the instant first-paint background on desktop before the 3D scene mounts.
+   Uses pre-baked radial gradients only — NO filter:blur (very costly on
+   mobile to rasterize a large blurred layer). */
 function HeroBackdrop() {
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute -top-[20%] right-[5%] h-[55vh] w-[55vh] rounded-full bg-azure/20 blur-[90px]" />
-      <div className="absolute bottom-[5%] -left-[15%] h-[45vh] w-[45vh] rounded-full bg-plasma/20 blur-[90px]" />
-      {/* Earth orb */}
-      <div
-        className="absolute right-[6%] top-1/2 h-48 w-48 -translate-y-1/2 rounded-full sm:h-64 sm:w-64"
-        style={{
-          background:
-            "radial-gradient(circle at 35% 30%, #4d8bff 0%, #0a2a6b 55%, #03061a 100%)",
-          boxShadow: "0 0 90px -10px rgba(77,139,255,0.6)",
-        }}
-      />
-      {/* faint static starfield */}
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            "radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #cfe0ff, transparent), radial-gradient(1px 1px at 40% 80%, #fff, transparent), radial-gradient(1px 1px at 85% 25%, #cfe0ff, transparent), radial-gradient(1px 1px at 55% 15%, #fff, transparent)",
-          backgroundSize: "auto",
-        }}
-      />
-    </div>
+    <div
+      className="absolute inset-0"
+      style={{
+        background: [
+          // nebula glows (soft via gradient falloff, not filter)
+          "radial-gradient(55vh 55vh at 92% 6%, rgba(77,139,255,0.16), transparent 62%)",
+          "radial-gradient(48vh 48vh at -6% 94%, rgba(176,107,255,0.14), transparent 62%)",
+          // Earth orb
+          "radial-gradient(circle at 78% 50%, #4d8bff 0, #0a2a6b 9%, transparent 16%)",
+          // faint static stars
+          "radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.7), transparent 100%)",
+          "radial-gradient(1.5px 1.5px at 70% 62%, rgba(207,224,255,0.6), transparent 100%)",
+          "radial-gradient(1.5px 1.5px at 42% 82%, rgba(255,255,255,0.6), transparent 100%)",
+          "radial-gradient(1.5px 1.5px at 86% 24%, rgba(207,224,255,0.55), transparent 100%)",
+          "radial-gradient(1.5px 1.5px at 55% 14%, rgba(255,255,255,0.6), transparent 100%)",
+        ].join(","),
+      }}
+    />
   );
 }
 

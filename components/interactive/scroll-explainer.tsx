@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import type { ScrollStep } from "@/lib/modules";
+import { useReducedEffects } from "../use-is-mobile";
 
 export default function ScrollExplainer({
   steps,
@@ -12,6 +13,7 @@ export default function ScrollExplainer({
   accent: string;
 }) {
   const [active, setActive] = useState(0);
+  const reduced = useReducedEffects();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -24,12 +26,12 @@ export default function ScrollExplainer({
       {/* Sticky animated panel */}
       <div className="lg:sticky lg:top-28 lg:h-fit">
         <div className="relative overflow-hidden rounded-3xl glass p-7">
-          {/* accent aura — opacity-only so the blur isn't re-rasterized each frame */}
+          {/* accent aura — static on mobile/reduced-motion to save the main thread */}
           <motion.div
             className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-3xl"
-            style={{ background: accent }}
-            animate={{ opacity: [0.12, 0.22, 0.12] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            style={{ background: accent, opacity: 0.16 }}
+            animate={reduced ? undefined : { opacity: [0.12, 0.22, 0.12] }}
+            transition={reduced ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }}
           />
 
           <div className="relative">
@@ -42,8 +44,8 @@ export default function ScrollExplainer({
                 <motion.span
                   className="h-2 w-2 rounded-full"
                   style={{ background: accent }}
-                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-                  transition={{ duration: 1.8, repeat: Infinity }}
+                  animate={reduced ? undefined : { opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+                  transition={reduced ? undefined : { duration: 1.8, repeat: Infinity }}
                 />
                 <span className="font-mono text-[10px] text-faint">LIVE</span>
               </span>
