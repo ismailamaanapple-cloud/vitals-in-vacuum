@@ -4,7 +4,6 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { MeshDistortMaterial, Icosahedron, Torus, Stars } from "@react-three/drei";
 import { useRef, useMemo, Suspense } from "react";
 import * as THREE from "three";
-import { useIsMobile } from "../use-is-mobile";
 import { useInView } from "../use-in-view";
 
 type Variant =
@@ -33,7 +32,7 @@ function Core({ color, variant }: { color: string; variant: Variant }) {
     mesh.current.scale.setScalar(pulse);
   });
 
-  const geom = variant === "bone" ? [1.5, 4] : [1.6, 5];
+  const geom = variant === "bone" ? [1.5, 3] : [1.6, 3];
   const distort =
     variant === "brain"
       ? 0.55
@@ -126,23 +125,22 @@ export default function ModuleVisual({
   color: string;
   variant: Variant;
 }) {
-  const isMobile = useIsMobile();
   const [ref, inView] = useInView<HTMLDivElement>("100px");
   return (
     <div ref={ref} className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0, 6], fov: 45 }}
-        dpr={isMobile ? [1, 1.5] : [1, 2]}
+        dpr={[1, 1.5]}
         frameloop={inView ? "always" : "never"}
-        gl={{ alpha: true, antialias: !isMobile, powerPreference: "high-performance" }}
+        gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.6} />
           <directionalLight position={[4, 4, 4]} intensity={2} />
           <pointLight position={[-4, -3, -2]} intensity={1.4} color={color} />
-          <Stars radius={80} depth={40} count={isMobile ? 600 : 1500} factor={3} fade speed={0.6} />
+          <Stars radius={80} depth={40} count={800} factor={3} fade speed={0.6} />
           <Core color={color} variant={variant} />
-          <Particles color={color} count={isMobile ? 250 : 600} />
+          <Particles color={color} count={350} />
           <Rings color={color} variant={variant} />
         </Suspense>
       </Canvas>

@@ -35,7 +35,7 @@ export default function SiteNav() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <nav
           className={`flex items-center justify-between rounded-2xl px-5 sm:px-7 py-4 transition-all duration-500 ${
-            scrolled ? "glass-strong" : "bg-transparent"
+            scrolled ? "glass-nav" : "bg-transparent"
           }`}
         >
           <Link href="/" className="group flex items-center gap-3">
@@ -94,7 +94,7 @@ export default function SiteNav() {
         </nav>
 
         {open && (
-          <div className="mt-2 grid gap-1 rounded-2xl glass-strong p-3 md:hidden">
+          <div className="mt-2 grid gap-1 rounded-2xl glass-nav p-3 md:hidden">
             {TABS.map((t) => (
               <Link
                 key={t.href}

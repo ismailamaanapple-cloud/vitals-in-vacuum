@@ -2,16 +2,58 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useIsMobile } from "./use-is-mobile";
 
 const HeroScene = dynamic(() => import("./three/hero-scene"), { ssr: false });
 
+/* Cheap, GPU-friendly CSS space backdrop — used on mobile (no WebGL) and as
+   the instant first-paint background on desktop before the 3D scene mounts. */
+function HeroBackdrop() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute -top-[20%] right-[5%] h-[55vh] w-[55vh] rounded-full bg-azure/20 blur-[90px]" />
+      <div className="absolute bottom-[5%] -left-[15%] h-[45vh] w-[45vh] rounded-full bg-plasma/20 blur-[90px]" />
+      {/* Earth orb */}
+      <div
+        className="absolute right-[6%] top-1/2 h-48 w-48 -translate-y-1/2 rounded-full sm:h-64 sm:w-64"
+        style={{
+          background:
+            "radial-gradient(circle at 35% 30%, #4d8bff 0%, #0a2a6b 55%, #03061a 100%)",
+          boxShadow: "0 0 90px -10px rgba(77,139,255,0.6)",
+        }}
+      />
+      {/* faint static starfield */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage:
+            "radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #cfe0ff, transparent), radial-gradient(1px 1px at 40% 80%, #fff, transparent), radial-gradient(1px 1px at 85% 25%, #cfe0ff, transparent), radial-gradient(1px 1px at 55% 15%, #fff, transparent)",
+          backgroundSize: "auto",
+        }}
+      />
+    </div>
+  );
+}
+
 export default function Hero() {
+  const isMobile = useIsMobile();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  // Only run WebGL on desktop, and only after first paint (faster load, no SSR mismatch).
+  const showWebGL = mounted && !isMobile;
+
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden">
-      {/* 3D background */}
+      {/* Background: CSS backdrop everywhere, 3D layered on top for desktop */}
       <div className="absolute inset-0 z-0">
-        <HeroScene />
+        <HeroBackdrop />
+        {showWebGL && (
+          <div className="absolute inset-0">
+            <HeroScene />
+          </div>
+        )}
       </div>
 
       {/* gradient vignette */}

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import SmoothScroll from "@/components/smooth-scroll";
 import SiteNav from "@/components/site-nav";
 import SiteFooter from "@/components/site-footer";
 
@@ -37,7 +36,6 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${inter.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col grain">
-        <SmoothScroll />
         <SiteNav />
         <main className="flex-1">{children}</main>
         <SiteFooter />

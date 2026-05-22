@@ -2,9 +2,8 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Stars, Float, Icosahedron, Sphere } from "@react-three/drei";
-import { useRef, useMemo, Suspense } from "react";
+import { useRef, Suspense } from "react";
 import * as THREE from "three";
-import { useIsMobile } from "../use-is-mobile";
 import { useInView } from "../use-in-view";
 
 function Earth() {
@@ -19,7 +18,7 @@ function Earth() {
   return (
     <group>
       {/* Ocean core */}
-      <Sphere ref={core} args={[2, 64, 64]}>
+      <Sphere ref={core} args={[2, 32, 32]}>
         <meshStandardMaterial
           color="#0a2a6b"
           emissive="#0b3d91"
@@ -28,8 +27,8 @@ function Earth() {
           metalness={0.2}
         />
       </Sphere>
-      {/* Data wireframe shell */}
-      <Icosahedron ref={wire} args={[2.06, 6]}>
+      {/* Data wireframe shell (low detail — it's decorative) */}
+      <Icosahedron ref={wire} args={[2.06, 2]}>
         <meshBasicMaterial
           color="#38e1ff"
           wireframe
@@ -37,20 +36,12 @@ function Earth() {
           opacity={0.18}
         />
       </Icosahedron>
-      {/* Atmosphere glow */}
-      <Sphere args={[2.25, 64, 64]}>
+      {/* Atmosphere glow (single layer) */}
+      <Sphere args={[2.3, 32, 32]}>
         <meshBasicMaterial
           color="#4d8bff"
           transparent
           opacity={0.12}
-          side={THREE.BackSide}
-        />
-      </Sphere>
-      <Sphere args={[2.5, 64, 64]}>
-        <meshBasicMaterial
-          color="#38e1ff"
-          transparent
-          opacity={0.05}
           side={THREE.BackSide}
         />
       </Sphere>
@@ -110,12 +101,12 @@ function Astronaut({
     <group ref={body} scale={scale}>
       {/* Helmet */}
       <mesh position={[0, 0.62, 0]}>
-        <sphereGeometry args={[0.3, 32, 32]} />
+        <sphereGeometry args={[0.3, 16, 16]} />
         {suitMat}
       </mesh>
       {/* Visor */}
       <mesh position={[0, 0.62, 0.16]}>
-        <sphereGeometry args={[0.24, 32, 32]} />
+        <sphereGeometry args={[0.24, 16, 16]} />
         <meshStandardMaterial
           color="#0a1130"
           emissive="#38e1ff"
@@ -249,12 +240,12 @@ function Rocket({
     <group ref={g} position={[x, baseY, z]}>
       {/* Body */}
       <mesh>
-        <cylinderGeometry args={[0.16, 0.2, 1.1, 20]} />
+        <cylinderGeometry args={[0.16, 0.2, 1.1, 12]} />
         <meshStandardMaterial color="#eef2ff" roughness={0.4} metalness={0.5} />
       </mesh>
       {/* Nose cone */}
       <mesh position={[0, 0.75, 0]}>
-        <coneGeometry args={[0.16, 0.45, 20]} />
+        <coneGeometry args={[0.16, 0.45, 12]} />
         <meshStandardMaterial color="#38e1ff" emissive="#38e1ff" emissiveIntensity={0.4} />
       </mesh>
       {/* Fins */}
@@ -266,72 +257,51 @@ function Rocket({
       ))}
       {/* Exhaust plume */}
       <mesh ref={plume} position={[0, -0.95, 0]}>
-        <coneGeometry args={[0.18, 0.9, 16]} />
+        <coneGeometry args={[0.18, 0.9, 12]} />
         <meshBasicMaterial color={flame} transparent opacity={0.9} />
       </mesh>
       {/* Long fading smoke/light trail */}
       <mesh ref={trail} position={[0, -1.6, 0]}>
-        <cylinderGeometry args={[0.05, 0.16, 1.4, 12]} />
+        <cylinderGeometry args={[0.05, 0.16, 1.4, 8]} />
         <meshBasicMaterial color={flame} transparent opacity={0.3} />
       </mesh>
-      {/* Engine glow */}
-      <pointLight position={[0, -1, 0]} intensity={3} distance={4} color={flame} />
     </group>
   );
 }
 
-function Scene({ isMobile }: { isMobile: boolean }) {
-  const astronauts = useMemo(() => {
-    const all = [
-      {
-        start: [-5.5, -2.2, -1] as [number, number, number],
-        drift: [3.5, 4, 1.5] as [number, number, number],
-        period: 26,
-        scale: 0.62,
-        spin: 0.22,
-        suit: "#eef2ff",
-      },
-      {
-        start: [5.8, 2.6, -2] as [number, number, number],
-        drift: [-3, -4.5, 1] as [number, number, number],
-        period: 34,
-        scale: 0.42,
-        spin: -0.3,
-        suit: "#dfe7ff",
-      },
-      {
-        start: [-6.5, 2.8, -3] as [number, number, number],
-        drift: [2, -3, 2] as [number, number, number],
-        period: 40,
-        scale: 0.34,
-        spin: 0.18,
-        suit: "#cfd8f5",
-      },
-    ];
-    return isMobile ? all.slice(0, 2) : all;
-  }, [isMobile]);
+const ASTRONAUTS = [
+  {
+    start: [-5.5, -2.2, -1] as [number, number, number],
+    drift: [3.5, 4, 1.5] as [number, number, number],
+    period: 26,
+    scale: 0.62,
+    spin: 0.22,
+    suit: "#eef2ff",
+  },
+  {
+    start: [5.8, 2.6, -2] as [number, number, number],
+    drift: [-3, -4.5, 1] as [number, number, number],
+    period: 34,
+    scale: 0.42,
+    spin: -0.3,
+    suit: "#dfe7ff",
+  },
+];
 
+function Scene() {
   return (
     <>
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={0.55} />
       <directionalLight position={[5, 3, 5]} intensity={2.2} color="#fff5e8" />
       <pointLight position={[-6, -2, -4]} intensity={1.5} color="#b06bff" />
-      <Stars
-        radius={120}
-        depth={60}
-        count={isMobile ? 1800 : 5000}
-        factor={4}
-        saturation={0}
-        fade
-        speed={1}
-      />
+      <Stars radius={120} depth={60} count={3000} factor={4} saturation={0} fade speed={1} />
 
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.4}>
         <Earth />
       </Float>
       <Station />
 
-      {astronauts.map((a, i) => (
+      {ASTRONAUTS.map((a, i) => (
         <DriftingAstronaut key={i} {...a} />
       ))}
 
@@ -339,28 +309,24 @@ function Scene({ isMobile }: { isMobile: boolean }) {
       <group position={[0, 0, -4]}>
         <Rocket x={-4.4} z={-2} period={9} delay={0} scale={0.85} flame="#ffb23e" />
         <Rocket x={4.8} z={-3} period={11} delay={4} scale={0.7} flame="#ff6b3d" />
-        {!isMobile && (
-          <Rocket x={-1.5} z={-6} period={13} delay={7} scale={0.5} flame="#38e1ff" />
-        )}
       </group>
     </>
   );
 }
 
 export default function HeroScene() {
-  const isMobile = useIsMobile();
   const [ref, inView] = useInView<HTMLDivElement>("100px");
 
   return (
     <div ref={ref} className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0, 7], fov: 45 }}
-        dpr={isMobile ? [1, 1.5] : [1, 2]}
+        dpr={[1, 1.5]}
         frameloop={inView ? "always" : "never"}
-        gl={{ antialias: !isMobile, alpha: true, powerPreference: "high-performance" }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Suspense fallback={null}>
-          <Scene isMobile={isMobile} />
+          <Scene />
         </Suspense>
       </Canvas>
     </div>
